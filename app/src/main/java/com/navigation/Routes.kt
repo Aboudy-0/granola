@@ -15,3 +15,5 @@ const val ROUT_EDIT_PRODUCT = "edit_product/{productId}"
 
 // ✅ Helper function for navigation
 fun editProductRoute(productId: Int) = "edit_product/$productId"
+
+const val ROUT_CONTACT = "contact"

@@ -18,6 +18,7 @@ import com.example.granola.repository.UserRepository
 import com.example.granola.ui.screens.about.AboutScreen
 import com.example.granola.ui.screens.auth.LoginScreen
 import com.example.granola.ui.screens.auth.RegisterScreen
+import com.example.granola.ui.screens.contact.ContactScreen
 import com.example.granola.ui.screens.home.HomeScreen
 import com.example.granola.ui.screens.products.AddProductScreen
 import com.example.granola.ui.screens.products.ProductListScreen
@@ -30,7 +31,7 @@ import com.example.granola.viewmodel.ProductViewModel
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = ROUT_ADD_PRODUCT,
+    startDestination: String = ROUT_CONTACT,
     productViewModel: ProductViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -45,6 +46,10 @@ fun AppNavHost(
         }
         composable(ROUT_ABOUT) {
             AboutScreen(navController)
+        }
+
+        composable(ROUT_CONTACT) {
+            ContactScreen(navController)
         }
 
         //AUTHENTICATION

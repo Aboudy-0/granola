@@ -31,6 +31,7 @@ import com.example.granola.R
 import com.example.granola.viewmodel.AuthViewModel
 import com.navigation.ROUT_ABOUT
 import com.navigation.ROUT_HOME
+import com.navigation.ROUT_PRODUCT_LIST
 import com.navigation.ROUT_REGISTER
 
 //import com.navigation.ROUT_REGISTER
@@ -53,10 +54,10 @@ fun LoginScreen(
                 Toast.makeText(context, "Invalid Credentials", Toast.LENGTH_SHORT).show()
             } else {
                 if (user.role == "admin") {
-                    navController.navigate(ROUT_ABOUT) {
+                    navController.navigate(ROUT_PRODUCT_LIST) {
                     }
                 } else {
-                    navController.navigate(ROUT_ABOUT) {
+                    navController.navigate(ROUT_HOME) {
                     }
                 }
             }

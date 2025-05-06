@@ -19,9 +19,13 @@ import com.example.granola.ui.screens.about.AboutScreen
 import com.example.granola.ui.screens.auth.LoginScreen
 import com.example.granola.ui.screens.auth.RegisterScreen
 import com.example.granola.ui.screens.contact.ContactScreen
+import com.example.granola.ui.screens.custom.CustomScreen
 import com.example.granola.ui.screens.home.HomeScreen
 import com.example.granola.ui.screens.products.AddProductScreen
 import com.example.granola.ui.screens.products.ProductListScreen
+import com.example.granola.ui.screens.products.UserProductListScreen
+import com.example.granola.ui.screens.recipe.RecipeScreen
+import com.example.granola.ui.screens.splash.SplashScreen
 import com.example.granola.viewmodel.AuthViewModel
 import com.example.granola.viewmodel.ProductViewModel
 
@@ -31,7 +35,7 @@ import com.example.granola.viewmodel.ProductViewModel
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = ROUT_CONTACT,
+    startDestination: String = ROUT_LOGIN,
     productViewModel: ProductViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -50,6 +54,18 @@ fun AppNavHost(
 
         composable(ROUT_CONTACT) {
             ContactScreen(navController)
+        }
+
+        composable(ROUT_SPLASH) {
+            SplashScreen(navController)
+        }
+
+        composable(ROUT_CUSTOM) {
+            CustomScreen(navController)
+        }
+
+        composable(ROUT_IDEA) {
+            RecipeScreen(navController)
         }
 
         //AUTHENTICATION
@@ -82,6 +98,11 @@ fun AppNavHost(
         composable(ROUT_PRODUCT_LIST) {
             ProductListScreen(navController, productViewModel)
         }
+
+        composable(ROUT_USER_PRODUCT_LIST) {
+            UserProductListScreen(navController, productViewModel)
+        }
+
 
         composable(
             route = ROUT_EDIT_PRODUCT,

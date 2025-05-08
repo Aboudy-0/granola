@@ -17,6 +17,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -25,6 +26,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.painter.Painter
@@ -40,12 +42,18 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.granola.R
 import com.example.granola.viewmodel.ProductViewModel
 import com.example.granola.model.Product
+import com.example.granola.ui.theme.DarkBrown
+import com.example.granola.ui.theme.LightBrown
+import com.example.granola.ui.theme.MediumBrown
+import com.navigation.ROUT_ABOUT
 import com.navigation.ROUT_ADD_PRODUCT
+import com.navigation.ROUT_CONTACT
+import com.navigation.ROUT_CUSTOM
 import com.navigation.ROUT_EDIT_PRODUCT
+import com.navigation.ROUT_HOME
 import com.navigation.ROUT_PRODUCT_LIST
-import com.navigation.editProductRoute
-import java.io.File
-import java.io.FileOutputStream
+import com.navigation.ROUT_USER_PRODUCT_LIST
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.io.OutputStream
 
@@ -54,84 +62,144 @@ import java.io.OutputStream
 @Composable
 fun UserProductListScreen(navController: NavController, viewModel: ProductViewModel) {
     val productList by viewModel.allProducts.observeAsState(emptyList())
-    var showMenu by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    val selectedItem = remember { mutableStateOf("Products") }
 
     val filteredProducts = productList.filter {
         it.name.contains(searchQuery, ignoreCase = true)
     }
 
-    Scaffold(
-        topBar = {
-            Column {
-                TopAppBar(
-                    title = { Text("Products", fontSize = 20.sp) },
-                    colors = TopAppBarDefaults.mediumTopAppBarColors(Color.LightGray),
-                    actions = {
-                        IconButton(onClick = { showMenu = true }) {
-                            Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
-                        }
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Product List") },
-                                onClick = {
-                                    navController.navigate(ROUT_PRODUCT_LIST)
-                                    showMenu = false
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Add Product") },
-                                onClick = {
-                                    navController.navigate(ROUT_ADD_PRODUCT)
-                                    showMenu = false
-                                }
-                            )
-                        }
-                    }
-                )
-
-
-                //Search Bar
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    placeholder = { Text("Search products...") },
-                    singleLine = true,
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = Color.Gray
-                        )
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Black,  // Border color when focused
-                        unfocusedBorderColor = Color.Gray, // Border color when not focused
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.DarkGray
-                    )
-                )
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            DrawerContent(navController, selectedItem) {
+                scope.launch { drawerState.close() }
             }
-        },
-        bottomBar = { BottomNavigationBar1(navController) }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            LazyColumn {
-                items(filteredProducts.size) { index ->
-                    ProductItem1(navController, filteredProducts[index], viewModel)
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                Column {
+                    CenterAlignedTopAppBar(
+                        title = { Text("LujaGranola") },
+                        navigationIcon = {
+                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                Icon(Icons.Default.Menu, contentDescription = "Menu")
+                            }
+                        },
+                        actions = {
+                            IconButton(onClick = { /* navController.navigate("cart") */ }) {
+                                Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
+                            }
+                        }
+                    )
+
+                    // Search Bar
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        placeholder = { Text("Search products...") },
+                        singleLine = true,
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search",
+                                tint = Color.Gray
+                            )
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.Gray,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.DarkGray
+                        )
+                    )
                 }
             }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+            ) {
+                LazyColumn {
+                    items(filteredProducts.size) { index ->
+                        ProductItem1(navController, filteredProducts[index], viewModel)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DrawerContent(
+    navController: NavController,
+    selectedItem: MutableState<String>,
+    onItemClicked: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        // Drawer header
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp)
+                .padding(bottom = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(R.drawable.img_1),
+                contentDescription = "App Logo",
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+            )
+        }
+
+        // Drawer items
+        val drawerItems = listOf(
+            "Home" to ROUT_HOME,
+            "Products" to ROUT_USER_PRODUCT_LIST,
+            "Custom Order" to ROUT_CUSTOM,
+            "About" to ROUT_ABOUT,
+            "Contact" to ROUT_CONTACT
+        )
+
+        drawerItems.forEach { (item, route) ->
+            NavigationDrawerItem(
+                label = {
+                    Text(
+                        text = item,
+                        color = Color.White,
+                        fontWeight = if (selectedItem.value == item) FontWeight.Bold else FontWeight.Normal
+                    )
+                },
+                selected = selectedItem.value == item,
+                onClick = {
+                    selectedItem.value = item
+                    navController.navigate(route) {
+                        popUpTo("home") { inclusive = true }
+                    }
+                    onItemClicked()
+                },
+                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                colors = NavigationDrawerItemDefaults.colors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
+                    unselectedContainerColor = LightBrown,
+                    selectedTextColor = DarkBrown,
+                    unselectedTextColor = MediumBrown
+                )
+            )
         }
     }
 }
@@ -229,9 +297,6 @@ fun ProductItem1(navController: NavController, product: Product, viewModel: Prod
                         }
                     }
 
-
-
-
                     // Download PDF
                     IconButton(
                         onClick = { generateProductPDF1(context, product) }
@@ -313,20 +378,4 @@ fun generateProductPDF1(context: Context, product: Product) {
     }
 
     pdfDocument.close()
-}
-
-// Bottom Navigation Bar Component
-@Composable
-fun BottomNavigationBar2(navController: NavController) {
-    NavigationBar(
-        containerColor = Color(0xFFA2B9A2),
-        contentColor = Color.White
-    ) {
-        NavigationBarItem(
-            selected = false,
-            onClick = { navController.navigate(ROUT_PRODUCT_LIST) },
-            icon = { Icon(Icons.Default.Home, contentDescription = "Product List") },
-            label = { Text("Home") }
-        )
-    }
 }

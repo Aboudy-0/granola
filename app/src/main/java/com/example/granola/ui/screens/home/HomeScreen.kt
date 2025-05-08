@@ -9,7 +9,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ModalDrawer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -27,49 +26,130 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.granola.R
+import com.example.granola.ui.theme.DarkBrown
 import com.example.granola.ui.theme.GranolaTheme
+import com.example.granola.ui.theme.LightBackground
+import com.example.granola.ui.theme.LightBrown
+import com.example.granola.ui.theme.MediumBrown
 import com.google.accompanist.pager.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import com.navigation.ROUT_ABOUT
 import com.navigation.ROUT_CONTACT
 import com.navigation.ROUT_CUSTOM
 import com.navigation.ROUT_HOME
+import com.navigation.ROUT_IDEA
 import com.navigation.ROUT_USER_PRODUCT_LIST
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-// ========== Main HomeScreen ==========
-
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
 fun HomeScreen(navController: NavController) {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val selectedItem = remember { mutableStateOf("Home") }
 
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("LujaGranola") },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { navController.navigate("cart") }) {
-                        Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
-                    }
-                }
-            )
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            DrawerContent(navController, selectedItem) {
+                scope.launch { drawerState.close() }
+            }
         }
-    ) { paddingValues ->
-        HomeScreenContent(navController, paddingValues)
+    ) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("LujaGranola") },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            scope.launch { drawerState.open() }
+                        }) {
+                            Icon(Icons.Default.Menu, contentDescription = "Menu")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { /* navController.navigate("cart") */ }) {
+                            Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
+                        }
+                    }
+                )
+            }
+        ) { paddingValues ->
+            HomeScreenContent(navController, paddingValues)
+        }
     }
 }
 
+@Composable
+fun DrawerContent(
+    navController: NavController,
+    selectedItem: MutableState<String>,
+    onItemClicked: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        // Drawer header
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp)
+                .padding(bottom = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(R.drawable.img_1),
+                contentDescription = "App Logo",
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+            )
+        }
 
-// ========== HomeScreen Content ==========
+        // Drawer items
+        val drawerItems = listOf(
+            "Home" to ROUT_HOME,
+            "Products" to ROUT_USER_PRODUCT_LIST,
+            "Custom Order" to ROUT_CUSTOM,
+            "About" to ROUT_ABOUT,
+            "Contact" to ROUT_CONTACT,
+            "Granola Ideas" to ROUT_IDEA
+        )
+
+        drawerItems.forEach { (item, route) ->
+            NavigationDrawerItem(
+                label = {
+                    Text(
+                        text = item,
+                        color = Color.White,
+                        fontWeight = if (selectedItem.value == item) FontWeight.Bold else FontWeight.Normal
+                    )
+                },
+                selected = selectedItem.value == item,
+                onClick = {
+                    selectedItem.value = item
+                    navController.navigate(route) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                    onItemClicked()
+                },
+                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                colors = NavigationDrawerItemDefaults.colors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
+                    unselectedContainerColor = LightBrown,
+                    selectedTextColor = DarkBrown,
+                    unselectedTextColor = MediumBrown
+                )
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -81,7 +161,9 @@ fun HomeScreenContent(navController: NavController, paddingValues: PaddingValues
         while (true) {
             delay(3000)
             val nextPage = (pagerState.currentPage + 1) % popularProducts.size
-            pagerState.animateScrollToPage(nextPage)
+            scope.launch {
+                pagerState.animateScrollToPage(nextPage)
+            }
         }
     }
 
@@ -185,10 +267,50 @@ fun HomeScreenContent(navController: NavController, paddingValues: PaddingValues
                 HowItWorksStep(index + 1, step)
             }
         }
+
+        // Granola Ideas Section
+        Spacer(modifier = Modifier.height(16.dp))
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = LightBackground
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Don't know how to eat your granola?",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = DarkBrown,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Discover delicious ways to enjoy it!",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MediumBrown,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                Button(
+                    onClick = { navController.navigate(ROUT_IDEA) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = DarkBrown,
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp)
+                ) {
+                    Text("Get Granola Ideas")
+                }
+            }
+        }
     }
 }
-
-// ========== Components ==========
 
 @Composable
 fun FeatureItem(feature: String) {
@@ -243,11 +365,7 @@ fun HowItWorksStep(number: Int, text: String) {
     }
 }
 
-// ========== Data Models ==========
-
 data class Product(val name: String, val imageRes: Int, val price: String = "Ksh.650")
-
-// ========== Sample Data ==========
 
 val features = listOf("Organic", "Creative", "Fresh", "Eco-Friendly")
 
@@ -261,10 +379,8 @@ val popularProducts = listOf(
 val howItWorksSteps = listOf(
     "Choose your granola",
     "It gets safely packed",
-    "It’s brought to you!!"
+    "It's brought to you!!"
 )
-
-// ========== Preview ==========
 
 @Preview(showBackground = true)
 @Composable

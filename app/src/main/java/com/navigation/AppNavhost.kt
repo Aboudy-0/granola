@@ -19,7 +19,7 @@ import com.example.granola.ui.screens.about.AboutScreen
 import com.example.granola.ui.screens.auth.LoginScreen
 import com.example.granola.ui.screens.auth.RegisterScreen
 import com.example.granola.ui.screens.contact.ContactScreen
-import com.example.granola.ui.screens.custom.CustomScreen
+import com.example.granola.ui.screens.custom.CustomGranolaScreen
 import com.example.granola.ui.screens.home.HomeScreen
 import com.example.granola.ui.screens.products.AddProductScreen
 import com.example.granola.ui.screens.products.ProductListScreen
@@ -35,7 +35,7 @@ import com.example.granola.viewmodel.ProductViewModel
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = ROUT_LOGIN,
+    startDestination: String = ROUT_SPLASH,
     productViewModel: ProductViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -59,10 +59,11 @@ fun AppNavHost(
         composable(ROUT_SPLASH) {
             SplashScreen(navController)
         }
-
         composable(ROUT_CUSTOM) {
-            CustomScreen(navController)
+            CustomGranolaScreen(navController)
         }
+
+
 
         composable(ROUT_IDEA) {
             RecipeScreen(navController)
@@ -120,3 +121,5 @@ fun AppNavHost(
 
 
 }
+
+

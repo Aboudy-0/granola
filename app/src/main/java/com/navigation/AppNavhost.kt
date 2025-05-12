@@ -66,6 +66,7 @@ fun AppNavHost(
             RecipeScreen(navController)
         }
 
+
         //AUTHENTICATION
 
         // Initialize Room Database and Repository for Authentication

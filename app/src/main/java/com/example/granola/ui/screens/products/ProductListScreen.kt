@@ -250,7 +250,7 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
                 Text(
                     text = "Price: Ksh${product.price}",
                     fontSize = 16.sp,
-                    color = Color.White
+                    color = Color.Green
                 )
                 Text(
                     text = "Phone: ${product.phone}",

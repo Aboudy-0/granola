@@ -293,7 +293,7 @@ fun ProductItem1(navController: NavController, product: Product, viewModel: Prod
                     text = "Ksh${product.price}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = LightBrown
+                    color = Color.Green
                 )
             }
 

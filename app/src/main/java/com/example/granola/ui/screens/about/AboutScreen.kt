@@ -1,6 +1,7 @@
 package com.example.granola.ui.screens.about
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -22,12 +23,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.granola.R
+import com.example.granola.ui.screens.home.BackgroundBrown
+import com.example.granola.ui.screens.home.TextOnBrown
 import com.example.granola.ui.theme.DarkBrown
 import com.example.granola.ui.theme.LightBrown
 import com.example.granola.ui.theme.MediumBrown
 import com.navigation.ROUT_ABOUT
 import com.navigation.ROUT_CONTACT
-import com.navigation.ROUT_CUSTOM
 import com.navigation.ROUT_HOME
 import com.navigation.ROUT_USER_PRODUCT_LIST
 import kotlinx.coroutines.launch
@@ -50,15 +52,18 @@ fun AboutScreen(navController: NavController) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("LujaGranola") },
+                    title = { Text("LujaGranola", color = TextOnBrown) },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = com.example.granola.ui.screens.home.DarkBrown,
+                        titleContentColor = TextOnBrown,
+                        navigationIconContentColor = TextOnBrown,
+                        actionIconContentColor = TextOnBrown
+                    ),
                     navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                        IconButton(onClick = {
+                            scope.launch { drawerState.open() }
+                        }) {
                             Icon(Icons.Default.Menu, contentDescription = "Menu")
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { /* navController.navigate("cart") */ }) {
-                            Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
                         }
                     }
                 )
@@ -74,6 +79,7 @@ fun AboutScreenContent(navController: NavController, paddingValues: PaddingValue
     Column(
         modifier = Modifier
             .padding(paddingValues)
+            .background(LightBrown)
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -113,7 +119,7 @@ fun AboutScreenContent(navController: NavController, paddingValues: PaddingValue
                 )
 
                 Text(
-                    "Born in Mombasa, LujaGranola combines local flavors with " +
+                    "Born in Nairobi, LujaGranola combines local flavors with " +
                             "healthy ingredients to create delicious snacks that " +
                             "everyone can enjoy.",
                     style = MaterialTheme.typography.bodyLarge
@@ -192,7 +198,6 @@ fun DrawerContent(
         val drawerItems = listOf(
             "Home" to ROUT_HOME,
             "Products" to ROUT_USER_PRODUCT_LIST,
-            "Custom Order" to ROUT_CUSTOM,
             "About" to ROUT_ABOUT,
             "Contact" to ROUT_CONTACT
         )

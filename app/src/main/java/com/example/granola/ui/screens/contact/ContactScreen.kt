@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -33,7 +34,6 @@ import com.example.granola.ui.theme.LightBrown
 import com.example.granola.ui.theme.MediumBrown
 import com.navigation.ROUT_ABOUT
 import com.navigation.ROUT_CONTACT
-import com.navigation.ROUT_CUSTOM
 import com.navigation.ROUT_HOME
 import com.navigation.ROUT_USER_PRODUCT_LIST
 import kotlinx.coroutines.launch
@@ -44,7 +44,7 @@ fun ContactScreen(navController: NavController) {
     val context = LocalContext.current
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val selectedItem = remember { mutableStateOf("Contact") } // Set "Contact" as default selected
+    val selectedItem = remember { mutableStateOf("Contact") }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -57,15 +57,16 @@ fun ContactScreen(navController: NavController) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("LujaGranola") },
+                    title = { Text("LujaGranola", color = LightBrown) },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = DarkBrown,
+                        titleContentColor = LightBrown,
+                        navigationIconContentColor = LightBrown,
+                        actionIconContentColor = LightBrown
+                    ),
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(Icons.Default.Menu, contentDescription = "Menu")
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { /* navController.navigate("cart") */ }) {
-                            Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
                         }
                     }
                 )
@@ -87,10 +88,10 @@ fun ContactScreenContent(
             .padding(paddingValues)
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .background(MediumBrown)
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Header
         Spacer(modifier = Modifier.height(24.dp))
 
         Image(
@@ -105,13 +106,13 @@ fun ContactScreenContent(
         Text(
             "We're here to help!",
             style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.primary
+            color = DarkBrown
         )
 
         Text(
             "Reach out to our friendly team for any questions or feedback",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MediumBrown,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(vertical = 8.dp)
         )
@@ -161,11 +162,10 @@ fun ContactScreenContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Social Media
         Text(
             "Follow us on social media",
             style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MediumBrown
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -174,12 +174,12 @@ fun ContactScreenContent(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.padding(bottom = 32.dp)
         ) {
-            // Facebook Logo
             Image(
                 painter = painterResource(R.drawable.facebook),
                 contentDescription = "Facebook",
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(40.dp)
+                    .clip(CircleShape)
                     .clickable {
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://facebook.com/granola"))
                         context.startActivity(intent)
@@ -187,12 +187,12 @@ fun ContactScreenContent(
                 contentScale = ContentScale.Fit
             )
 
-            // Instagram Logo
             Image(
                 painter = painterResource(R.drawable.instagram),
                 contentDescription = "Instagram",
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(40.dp)
+                    .clip(CircleShape)
                     .clickable {
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://instagram.com/granola"))
                         context.startActivity(intent)
@@ -200,12 +200,12 @@ fun ContactScreenContent(
                 contentScale = ContentScale.Fit
             )
 
-            // Twitter Logo
             Image(
                 painter = painterResource(R.drawable.twitter),
                 contentDescription = "Twitter",
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(40.dp)
+                    .clip(CircleShape)
                     .clickable {
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/granola"))
                         context.startActivity(intent)
@@ -225,9 +225,9 @@ fun DrawerContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(LightBrown)
             .padding(16.dp)
     ) {
-        // Drawer header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -241,14 +241,13 @@ fun DrawerContent(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
+                    .border(2.dp, MediumBrown, CircleShape)
             )
         }
 
-        // Drawer items
         val drawerItems = listOf(
             "Home" to ROUT_HOME,
             "Products" to ROUT_USER_PRODUCT_LIST,
-            "Custom Order" to ROUT_CUSTOM,
             "About" to ROUT_ABOUT,
             "Contact" to ROUT_CONTACT
         )
@@ -258,7 +257,7 @@ fun DrawerContent(
                 label = {
                     Text(
                         text = item,
-                        color = Color.White,
+                        color = if (selectedItem.value == item) LightBrown else DarkBrown,
                         fontWeight = if (selectedItem.value == item) FontWeight.Bold else FontWeight.Normal
                     )
                 },
@@ -272,10 +271,10 @@ fun DrawerContent(
                 },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
-                    unselectedContainerColor = LightBrown,
+                    selectedContainerColor = MediumBrown.copy(alpha = 0.3f),
+                    unselectedContainerColor = Color.Transparent,
                     selectedTextColor = DarkBrown,
-                    unselectedTextColor = MediumBrown
+                    unselectedTextColor = DarkBrown
                 )
             )
         }
@@ -297,8 +296,9 @@ fun ContactCard(
             .padding(vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
+            containerColor = LightBrown
+        ),
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -311,35 +311,35 @@ fun ContactCard(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(MediumBrown)
                     .padding(8.dp),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                tint = LightBrown
             )
 
             Column {
                 Text(
                     title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = DarkBrown
                 )
                 Text(
                     subtitle,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MediumBrown
                 )
                 Text(
                     description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MediumBrown
                 )
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
             Icon(
-                imageVector = Icons.Default.LocationOn,
+                imageVector = Icons.Default.ChevronRight,
                 contentDescription = "Open",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MediumBrown
             )
         }
     }

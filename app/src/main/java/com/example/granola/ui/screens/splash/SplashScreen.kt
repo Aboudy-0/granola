@@ -45,7 +45,7 @@ fun SplashScreen(navController: NavController) {
 
     LaunchedEffect(Unit) {
         delay(3000)
-        navController.navigate("home") {
+        navController.navigate("login") {
             popUpTo("splash") { inclusive = true }
         }
     }
@@ -79,7 +79,7 @@ fun SplashScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "GRANOLA",
+                text = "LUJAGRANOLA",
                 color = Color(0xFF5C3A21),
                 fontSize = 36.sp,
                 fontWeight = FontWeight.ExtraBold,

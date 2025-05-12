@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -42,13 +43,14 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.granola.R
 import com.example.granola.viewmodel.ProductViewModel
 import com.example.granola.model.Product
+import com.example.granola.ui.theme.AccentBrown
 import com.example.granola.ui.theme.DarkBrown
+import com.example.granola.ui.theme.LightBackground
 import com.example.granola.ui.theme.LightBrown
 import com.example.granola.ui.theme.MediumBrown
 import com.navigation.ROUT_ABOUT
 import com.navigation.ROUT_ADD_PRODUCT
 import com.navigation.ROUT_CONTACT
-import com.navigation.ROUT_CUSTOM
 import com.navigation.ROUT_EDIT_PRODUCT
 import com.navigation.ROUT_HOME
 import com.navigation.ROUT_PRODUCT_LIST
@@ -56,6 +58,14 @@ import com.navigation.ROUT_USER_PRODUCT_LIST
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.io.OutputStream
+
+// Color Definitions (add these to your theme package if not already there)
+val darkBrown = Color(0xFF4E342E)
+val mediumBrown = Color(0xFF795548)
+val lightBrown = Color(0xFFD7CCC8)
+val backgroundBrown = Color(0xFFEFEBE9)
+val textOnBrown = Color.White
+val textOnLight = Color(0xFF3E2723)
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,57 +91,66 @@ fun UserProductListScreen(navController: NavController, viewModel: ProductViewMo
     ) {
         Scaffold(
             topBar = {
-                Column {
+                Column() {
                     CenterAlignedTopAppBar(
-                        title = { Text("LujaGranola") },
+                        title = {
+                            Text(
+                                "LujaGranola",
+                                color = textOnBrown,
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
+                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                            containerColor = darkBrown,
+                            navigationIconContentColor = textOnBrown,
+                            actionIconContentColor = textOnLight
+                        ),
                         navigationIcon = {
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(Icons.Default.Menu, contentDescription = "Menu")
                             }
-                        },
-                        actions = {
-                            IconButton(onClick = { /* navController.navigate("cart") */ }) {
-                                Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
-                            }
                         }
                     )
 
-                    // Search Bar
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
-                        placeholder = { Text("Search products...") },
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        placeholder = { Text("Search products...", color = mediumBrown) },
                         singleLine = true,
+                        shape = RoundedCornerShape(16.dp),
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "Search",
-                                tint = Color.Gray
+                                tint = mediumBrown
                             )
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color.Black,
-                            unfocusedBorderColor = Color.Gray,
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.DarkGray
+                            focusedContainerColor = darkBrown,
+                            unfocusedContainerColor = lightBrown,
+                            focusedBorderColor = textOnLight,
+                            unfocusedBorderColor = mediumBrown,
+                            focusedTextColor = textOnLight,
+                            unfocusedTextColor = mediumBrown
                         )
                     )
                 }
-            }
+            },
+            containerColor = LightBackground
         ) { paddingValues ->
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(backgroundBrown)
                     .padding(paddingValues)
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp)
             ) {
-                LazyColumn {
-                    items(filteredProducts.size) { index ->
-                        ProductItem1(navController, filteredProducts[index], viewModel)
-                    }
+                items(filteredProducts.size) { index ->
+                    ProductItem1(navController, filteredProducts[index], viewModel)
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
         }
@@ -147,14 +166,20 @@ fun DrawerContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(LightBrown)
             .padding(16.dp)
     ) {
-        // Drawer header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp)
-                .padding(bottom = 16.dp),
+                .height(140.dp)
+                .padding(bottom = 16.dp)
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(MediumBrown, LightBrown)
+                    ),
+                    shape = RoundedCornerShape(bottomEnd = 16.dp)
+                ),
             contentAlignment = Alignment.Center
         ) {
             Image(
@@ -163,14 +188,13 @@ fun DrawerContent(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
+                    .border(2.dp, AccentBrown, CircleShape)
             )
         }
 
-        // Drawer items
         val drawerItems = listOf(
             "Home" to ROUT_HOME,
             "Products" to ROUT_USER_PRODUCT_LIST,
-            "Custom Order" to ROUT_CUSTOM,
             "About" to ROUT_ABOUT,
             "Contact" to ROUT_CONTACT
         )
@@ -180,8 +204,8 @@ fun DrawerContent(
                 label = {
                     Text(
                         text = item,
-                        color = Color.White,
-                        fontWeight = if (selectedItem.value == item) FontWeight.Bold else FontWeight.Normal
+                        color = if (selectedItem.value == item) AccentBrown else DarkBrown,
+                        fontWeight = FontWeight.Medium
                     )
                 },
                 selected = selectedItem.value == item,
@@ -192,13 +216,16 @@ fun DrawerContent(
                     }
                     onItemClicked()
                 },
-                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                modifier = Modifier
+                    .padding(vertical = 4.dp)
+                    .fillMaxWidth(),
                 colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
-                    unselectedContainerColor = LightBrown,
-                    selectedTextColor = DarkBrown,
-                    unselectedTextColor = MediumBrown
-                )
+                    selectedContainerColor = AccentBrown.copy(alpha = 0.2f),
+                    unselectedContainerColor = Color.Transparent,
+                    selectedTextColor = AccentBrown,
+                    unselectedTextColor = DarkBrown
+                ),
+                shape = RoundedCornerShape(8.dp)
             )
         }
     }
@@ -215,44 +242,46 @@ fun ProductItem1(navController: NavController, product: Product, viewModel: Prod
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
             .clickable {
                 if (product.id != 0) {
                     navController.navigate(ROUT_EDIT_PRODUCT)
                 }
             },
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = LightBrown
+        )
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
-            // Product Image
             Image(
                 painter = painter,
                 contentDescription = "Product Image",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(220.dp),
                 contentScale = ContentScale.Crop
             )
 
-            // Gradient Overlay
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp)
+                    .height(100.dp)
                     .align(Alignment.BottomStart)
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
+                            colors = listOf(
+                                Color.Transparent,
+                                DarkBrown.copy(alpha = 0.8f)
+                            )
                         )
                     )
             )
 
-            // Product Info
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(start = 12.dp, bottom = 60.dp)
+                    .padding(16.dp)
             ) {
                 Text(
                     text = product.name,
@@ -261,52 +290,51 @@ fun ProductItem1(navController: NavController, product: Product, viewModel: Prod
                     color = Color.White
                 )
                 Text(
-                    text = "Price: Ksh${product.price}",
-                    fontSize = 16.sp,
-                    color = Color.White
+                    text = "Ksh${product.price}",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = LightBrown
                 )
             }
 
-            // Buttons (Message, Edit, Delete, Download PDF)
-            Box(
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
                     .align(Alignment.BottomEnd)
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                FilledTonalButton(
+                    onClick = {
+                        val smsIntent = Intent(Intent.ACTION_SENDTO)
+                        smsIntent.data = "smsto:${product.phone}".toUri()
+                        smsIntent.putExtra("sms_body", "Is the ${product.name} still available..?")
+                        context.startActivity(smsIntent)
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = AccentBrown,
+                        contentColor = Color.White
+                    )
                 ) {
-                    // Message Seller
-                    OutlinedButton(
-                        onClick = {
-                            val smsIntent = Intent(Intent.ACTION_SENDTO)
-                            smsIntent.data = "smsto:${product.phone}".toUri()
-                            smsIntent.putExtra("sms_body", "Hello Seller,...?")
-                            context.startActivity(smsIntent)
-                        },
-                        shape = RoundedCornerShape(8.dp),
-                    ) {
-                        Row {
-                            Icon(
-                                imageVector = Icons.Default.Send,
-                                contentDescription = "Message Seller"
-                            )
-                            Spacer(modifier = Modifier.width(3.dp))
-                            Text(text = "Message Seller")
-                        }
-                    }
+                    Icon(Icons.Default.Send, contentDescription = "Message Seller")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Message")
+                }
 
-                    // Download PDF
-                    IconButton(
-                        onClick = { generateProductPDF1(context, product) }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_file_download_24),
-                            contentDescription = "",
-                            tint = Color.White
+                IconButton(
+                    onClick = { generateProductPDF1(context, product) },
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            color = AccentBrown,
+                            shape = CircleShape
                         )
-                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_file_download_24),
+                        contentDescription = "Download PDF",
+                        tint = Color.White
+                    )
                 }
             }
         }
@@ -350,7 +378,6 @@ fun generateProductPDF1(context: Context, product: Product) {
 
     pdfDocument.finishPage(page)
 
-    // Save PDF using MediaStore (Scoped Storage)
     val fileName = "${product.name}_Details.pdf"
     val contentValues = ContentValues().apply {
         put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)

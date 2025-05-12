@@ -19,5 +19,4 @@ fun editProductRoute(productId: Int) = "edit_product/$productId"
 
 const val ROUT_CONTACT = "contact"
 const val ROUT_SPLASH = "splash"
-const val ROUT_CUSTOM = "custom"
 const val ROUT_IDEA = "recipe"

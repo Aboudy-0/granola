@@ -51,6 +51,7 @@ import com.example.granola.ui.theme.MediumBrown
 import com.navigation.ROUT_ABOUT
 import com.navigation.ROUT_ADD_PRODUCT
 import com.navigation.ROUT_CONTACT
+import com.navigation.ROUT_CUSTOM
 import com.navigation.ROUT_EDIT_PRODUCT
 import com.navigation.ROUT_HOME
 import com.navigation.ROUT_PRODUCT_LIST
@@ -196,7 +197,8 @@ fun DrawerContent(
             "Home" to ROUT_HOME,
             "Products" to ROUT_USER_PRODUCT_LIST,
             "About" to ROUT_ABOUT,
-            "Contact" to ROUT_CONTACT
+            "Contact" to ROUT_CONTACT,
+            "Custom" to ROUT_CUSTOM
         )
 
         drawerItems.forEach { (item, route) ->

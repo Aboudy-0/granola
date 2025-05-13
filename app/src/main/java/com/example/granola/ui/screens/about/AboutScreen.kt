@@ -30,6 +30,7 @@ import com.example.granola.ui.theme.LightBrown
 import com.example.granola.ui.theme.MediumBrown
 import com.navigation.ROUT_ABOUT
 import com.navigation.ROUT_CONTACT
+import com.navigation.ROUT_CUSTOM
 import com.navigation.ROUT_HOME
 import com.navigation.ROUT_USER_PRODUCT_LIST
 import kotlinx.coroutines.launch
@@ -147,21 +148,6 @@ fun AboutScreenContent(navController: NavController, paddingValues: PaddingValue
             }
         }
 
-        // Contact Info
-        OutlinedCard(
-            modifier = Modifier.padding(16.dp),
-            colors = CardDefaults.outlinedCardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
-        ) {
-            Text(
-                "✉️ hello@lujagranola.com",
-                modifier = Modifier.padding(16.dp),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-
         Spacer(modifier = Modifier.height(32.dp))
     }
 }
@@ -199,7 +185,8 @@ fun DrawerContent(
             "Home" to ROUT_HOME,
             "Products" to ROUT_USER_PRODUCT_LIST,
             "About" to ROUT_ABOUT,
-            "Contact" to ROUT_CONTACT
+            "Contact" to ROUT_CONTACT,
+            "Custom" to ROUT_CUSTOM
         )
 
         drawerItems.forEach { (item, route) ->
